@@ -157,18 +157,10 @@ gunicorn
 
 ---
 
-## 📸 Screenshots
-
-### 🔹 Web UI
-
-![Web UI Example](https://via.placeholder.com/800x400.png?text=AQI+Predictor+Web+UI)
-
----
-
 ## 👨‍💻 Author
 
-Developed by **\[Your Name]**
-📧 Contact: [your.email@example.com](mailto:your.email@example.com)
+Developed by **\[Anush S]**
+📧 Contact: [anushmv2001@gmail.com](mailto:your.email@example.com)
 
 ---
 
