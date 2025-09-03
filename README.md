@@ -23,3 +23,23 @@ The application is deployed on Render and can also run locally.
 
 --------------------------------------------------------------
 
+Setup & Installation
+🔹 1. Clone the Repository
+git clone https://github.com/your-username/aqi-predictor.git
+cd aqi-predictor
+
+🔹 2. Create Virtual Environment
+python -m venv venv
+source venv/bin/activate     # On Linux/Mac
+venv\Scripts\activate        # On Windows
+
+🔹 3. Install Dependencies
+pip install -r requirements.txt
+
+🔹 4. Run the Application Locally
+python app.py
+
+
+The app will run at:
+👉 http://127.0.0.1:5000
+
