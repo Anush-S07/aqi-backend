@@ -17,21 +17,27 @@ def home():
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
-        # Accept JSON or Form data
-        if request.is_json:
-            data = request.get_json()
-        else:
+        data = None
+
+        # First try JSON
+        try:
+            data = request.get_json(force=True)
+        except:
+            pass
+
+        # If not JSON, fall back to form
+        if not data:
             data = request.form.to_dict()
 
-        # Extract values
+        # Extract values safely
         pm25 = float(data.get("pm25", 0))
         pm10 = float(data.get("pm10", 0))
-        co = float(data.get("co", 0)) / 1000  # convert ppb to ppm if needed
+        co = float(data.get("co", 0)) / 1000
         so2 = float(data.get("so2", 0))
         no2 = float(data.get("no2", 0))
         o3 = float(data.get("o3", 0))
 
-        # Prepare input for model
+        # Prepare input
         input_data = np.array([[pm25, pm10, co, so2, no2, o3]])
 
         # Predict AQI
@@ -40,29 +46,17 @@ def predict():
 
         # Categorize AQI
         if aqi_value <= 50:
-            category = "Good"
-            color = "green"
-            description = "Minimal or no impact on health"
+            category = "Good"; color = "green"; description = "Minimal or no impact on health"
         elif aqi_value <= 100:
-            category = "Moderate"
-            color = "yellow"
-            description = "Breathing discomfort for sensitive groups"
+            category = "Moderate"; color = "yellow"; description = "Breathing discomfort for sensitive groups"
         elif aqi_value <= 150:
-            category = "Unhealthy for Sensitive Groups"
-            color = "orange"
-            description = "Health effects for sensitive individuals"
+            category = "Unhealthy for Sensitive Groups"; color = "orange"; description = "Health effects for sensitive individuals"
         elif aqi_value <= 200:
-            category = "Unhealthy"
-            color = "red"
-            description = "Health effects on the general population"
+            category = "Unhealthy"; color = "red"; description = "Health effects on the general population"
         elif aqi_value <= 300:
-            category = "Very Unhealthy"
-            color = "purple"
-            description = "Serious health effects"
+            category = "Very Unhealthy"; color = "purple"; description = "Serious health effects"
         else:
-            category = "Hazardous"
-            color = "maroon"
-            description = "Severe health effects; emergency conditions"
+            category = "Hazardous"; color = "maroon"; description = "Severe health effects; emergency conditions"
 
         return jsonify({
             "aqi": round(aqi_value, 2),
@@ -73,6 +67,7 @@ def predict():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+
 
 
 if __name__ == "__main__":
