@@ -4,118 +4,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AQI Prediction</title>
+    <title>AQI Predictor</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
+    <h1>Air Quality Index Predictor</h1>
 
-    <!-- Background video -->
-    <video autoplay muted loop class="video-background">
-        <source src="{{ url_for('static', filename='videoplayback.mp4') }}" type="video/mp4">
-    </video>
+    <form id="aqiForm">
+        <label>PM2.5 (µg/m³):</label>
+        <input type="number" id="pm25" step="0.1" required><br>
 
-    <div class="container">
-        <h2>AQI Prediction</h2>
-        <form id="aqiForm" action="{{ url_for('predict') }}" method="POST">
-            <label for="pm25">PM2.5 (µg/m³):</label>
-            <input type="number" id="pm25" name="pm25" required>
+        <label>PM10 (µg/m³):</label>
+        <input type="number" id="pm10" step="0.1" required><br>
 
-            <label for="pm10">PM10 (µg/m³):</label>
-            <input type="number" id="pm10" name="pm10" required>
+        <label>CO (ppb):</label>
+        <input type="number" id="co" step="0.1" required><br>
 
-            <label for="co">CO (ppb):</label>
-            <input type="number" id="co" name="co" required>
+        <label>SO₂ (ppb):</label>
+        <input type="number" id="so2" step="0.1" required><br>
 
-            <label for="so2">SO2 (ppb):</label>
-            <input type="number" id="so2" name="so2" required>
+        <label>NO₂ (ppb):</label>
+        <input type="number" id="no2" step="0.1" required><br>
 
-            <label for="no2">NO2 (ppb):</label>
-            <input type="number" id="no2" name="no2" required>
+        <label>O₃ (ppb):</label>
+        <input type="number" id="o3" step="0.1" required><br>
 
-            <label for="o3">O3 (ppb):</label>
-            <input type="number" id="o3" name="o3" required>
+        <button type="submit">Predict AQI</button>
+    </form>
 
-            <div class="button-container">
-                <button type="submit">Predict</button>
-                <button type="reset" class="clear-button">Clear</button>
-                <button type="button" id="showAqiBtn">Show AQI</button>
-            </div>
-
-            <div id="results">
-                <p id="aqi-result"></p>
-                <p id="category-result"></p>
-                <p id="description-result"></p>
-            </div>
-        </form>
-
-        <!-- AQI Image Container (Initially Hidden) -->
-        <div id="image-container" class="hidden">
-            <img src="{{ url_for('static', filename='aqi_p.jpg') }}" alt="AQI Chart" id="aqi-image">
-        </div>
-
-    </div>
+    <div id="result" style="margin-top:20px; font-weight:bold;"></div>
 
     <script>
-        const aqiForm = document.getElementById('aqiForm');
-        const aqiResult = document.getElementById('aqi-result');
-        const categoryResult = document.getElementById('category-result');
-        const descriptionResult = document.getElementById('description-result');
-        const showAqiBtn = document.getElementById('showAqiBtn');
-        const imageContainer = document.getElementById('image-container');
+        document.getElementById("aqiForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
 
-        // Handle form submission via AJAX for prediction
-        aqiForm.addEventListener('submit', function (event) {
-            event.preventDefault(); // Prevent form from submitting the traditional way
+            // Collect inputs
+            const data = {
+                pm25: parseFloat(document.getElementById("pm25").value),
+                pm10: parseFloat(document.getElementById("pm10").value),
+                co: parseFloat(document.getElementById("co").value),
+                so2: parseFloat(document.getElementById("so2").value),
+                no2: parseFloat(document.getElementById("no2").value),
+                o3: parseFloat(document.getElementById("o3").value)
+            };
 
-            const formData = new FormData(aqiForm);
-            fetch('{{ url_for("predict") }}', {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        aqiResult.textContent = `Error: ${data.error}`;
-                        categoryResult.textContent = '';
-                        descriptionResult.textContent = '';
-                    } else {
-                        displayResults(data.aqi, data.category, data.description, data.color);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    aqiResult.textContent = `Error: ${error}`;
-                });
-        });
+            // Call backend API (update URL to your Render backend)
+            const response = await fetch("https://aqi-backend.onrender.com/predict", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
 
-        // Display results and set colors
-        function displayResults(aqi, category, description, color) {
-            aqiResult.textContent = `AQI Value: ${aqi}`;
-            categoryResult.textContent = `Category: ${category}`;
-            descriptionResult.textContent = description;
+            const result = await response.json();
 
-            // Update background color and set text to black
-            aqiResult.style.backgroundColor = color;
-            categoryResult.style.backgroundColor = color;
-            descriptionResult.style.backgroundColor = color;
-
-            // Ensure text remains black for better readability
-            aqiResult.style.color = 'black';
-            categoryResult.style.color = 'black';
-            descriptionResult.style.color = 'black';
-        }
-
-        // Handle form reset to clear results
-        aqiForm.addEventListener('reset', function () {
-            aqiResult.textContent = '';
-            categoryResult.textContent = '';
-            descriptionResult.textContent = '';
-        });
-
-        // Toggle image visibility when the "Show AQI" button is clicked
-        showAqiBtn.addEventListener('click', function () {
-            imageContainer.classList.toggle('hidden');
+            if (result.error) {
+                document.getElementById("result").innerText = "Error: " + result.error;
+            } else {
+                document.getElementById("result").innerText =
+                    `AQI: ${result.aqi} | Category: ${result.category} | ${result.description}`;
+                document.getElementById("result").style.color = result.color;
+            }
         });
     </script>
 </body>
