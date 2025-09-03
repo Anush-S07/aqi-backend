@@ -1,8 +1,3 @@
-Got it 👍 — GitHub markdown needs **triple backticks (\`\`\`)** around code blocks to render them correctly.
-Here’s your **fixed README.md** (formatted properly so setup & installation steps appear as code blocks on GitHub).
-
----
-
 # 🌍 Air Quality Index (AQI) Predictor
 
 This project is a **Flask-based web application** that predicts the **Air Quality Index (AQI)** based on key pollutant levels (PM2.5, PM10, CO, SO₂, NO₂, O₃).
