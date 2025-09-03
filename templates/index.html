@@ -49,7 +49,7 @@
             };
 
             try {
-                const response = await fetch("/predict", {   // relative path
+                const response = await fetch("/predict", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(data)
@@ -64,11 +64,12 @@
                         `AQI: ${result.aqi} | Category: ${result.category} | ${result.description}`;
                     document.getElementById("result").style.color = result.color;
                 }
-            } catch (err) {
-                document.getElementById("result").innerText = "Error: " + err;
+            } catch (error) {
+                document.getElementById("result").innerText = "Request failed: " + error;
             }
         });
     </script>
+
 </body>
 
 </html>
